@@ -59,7 +59,7 @@ const Single = () => {
               {currentUser?.username === post?.username && (
                 <div className=" flex gap-1 px">
                   <div className="bg-teal-300 text-[10px] rounded-full w-7 h-7 flex item-center justify-center text-black-500">
-                    <Link to={`/write?edit=2`}>
+                    <Link to={`/write?edit=2`} state={post}>
                       <EditIcon />
                     </Link>
                   </div>

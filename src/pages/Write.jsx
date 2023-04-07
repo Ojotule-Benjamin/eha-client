@@ -4,17 +4,44 @@ import "react-quill/dist/quill.snow.css";
 import { useDropzone } from "react-dropzone";
 import FileUpload from "../components/FileUpload";
 import axios from "axios";
+import { useLocation } from "react-router-dom";
+import moment from "moment";
+import { useMutation } from "react-query";
+import { BASE_URL } from "./Home";
 
 const Write = () => {
-  const [value, setValue] = useState("");
-  const [title, setTitle] = useState("");
-  const [cat, setCat] = useState("");
+  const state = useLocation().state;
+  const [value, setValue] = useState(state?.title || "");
+  const [title, setTitle] = useState(state?.title || "");
+  const [cat, setCat] = useState(state?.cat || "");
   const [imgUrl, setImgUrl] = useState("");
   const [files, setFiles] = useState([]);
 
-  const handleClick = async (e) => {
-    e.preventDefault();
+  const postBlog = async () => {
+    const res = await axios.post(
+      `${BASE_URL}/api/posts`,
+      {
+        title,
+        desc: value,
+        cat,
+        img: imgUrl ? imgUrl : "",
+      },
+      {
+        headers: {
+          access_token: document.cookie.split("=")[1],
+        },
+      }
+    );
+    return res.data;
   };
+
+  const { mutate, isLoading, isError, data } = useMutation(
+    ["upload-post"],
+    postBlog,
+    {}
+  );
+
+  console.log({ mutate, isLoading, isError, data });
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     noClick: true,
@@ -28,29 +55,22 @@ const Write = () => {
         reader.onload = (readerEvt) => {
           // Do whatever you want with the file contents
           const image = reader.result;
-          console.log(image);
+
+          setImgUrl(image);
+          console.log(imgUrl);
         };
         reader.readAsDataURL(file);
       });
     },
   });
 
-  const uploadImage = async (event) => {
-    const file = event.target.files[0];
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64 = reader.result.replace(/^data:image\/\w+;base64,/, "");
-      try {
-        axios.post("/api/uploadImage", { image: base64 }).then((res) => {
-          setImgUrl(res.data);
-          console.log(res.data);
-          //console.log("Image uploaded successfully");
-        });
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    reader.readAsDataURL(file);
+  const handleClick = async (e) => {
+    e.preventDefault();
+    try {
+      mutate();
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const images = files.map((file) => (
@@ -71,6 +91,7 @@ const Write = () => {
             className="p-2 border outline-none border-gray-400 border-solid"
             type="text"
             placeholder="Title"
+            value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
           <div className="editorContainer h-80 overflow-scroll border border-gray-400 border-solid">
@@ -115,6 +136,7 @@ const Write = () => {
             <div className="cat flex items-center gap-[2px] text-teal-400">
               <input
                 type="radio"
+                checked={cat === "art"}
                 name="cat"
                 value="art"
                 id="art"
@@ -125,6 +147,7 @@ const Write = () => {
             <div className="cat  flex items-center gap-[2px] text-teal-400">
               <input
                 type="radio"
+                checked={cat === "science"}
                 name="cat"
                 value="science"
                 id="science"
@@ -135,6 +158,7 @@ const Write = () => {
             <div className="cat  flex items-center gap-[2px] text-teal-400">
               <input
                 type="radio"
+                checked={cat === "technology"}
                 name="cat"
                 value="technology"
                 id="technology"
@@ -145,6 +169,7 @@ const Write = () => {
             <div className="cat  flex items-center gap-[2px] text-teal-400">
               <input
                 type="radio"
+                checked={cat === "cinema"}
                 name="cat"
                 value="cinema"
                 id="cinema"
@@ -155,6 +180,7 @@ const Write = () => {
             <div className="cat  flex items-center gap-[2px] text-teal-400">
               <input
                 type="radio"
+                checked={cat === "design"}
                 name="cat"
                 value="design"
                 id="design"
@@ -165,6 +191,7 @@ const Write = () => {
             <div className="cat  flex items-center gap-[2px] text-teal-400">
               <input
                 type="radio"
+                checked={cat === "food"}
                 name="cat"
                 value="food"
                 id="food"
@@ -189,7 +216,10 @@ const Write = () => {
             position: "relative",
           }}
         >
-          <input onChange={uploadImage} {...getInputProps()} />
+          <input
+            //onClick={handleClick}
+            {...getInputProps()}
+          />
           <p className="text-xl font-light text-gray-400">Drag and drop here</p>
           <div className="w-full h-full absolute left-0 right-0 flex items-center justify-center">
             {images}
@@ -201,3 +231,19 @@ const Write = () => {
 };
 
 export default Write;
+
+// state
+// ? await axios.put(`./posts/${state.id}`, {
+//     title,
+//     desc: value,
+//     cat,
+//     img: imgUrl ? imgUrl : "",
+//   })
+// : await axios.post(`./posts/`, {
+//     title,
+//     desc: value,
+//     cat,
+//     img: imgUrl ? imgUrl : "",
+//     date: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
+//   });
+//await axios.post(`./posts`, { value, cat, title, imgUrl });
