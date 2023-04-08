@@ -26,6 +26,11 @@ const Home = () => {
     return <p>Ooppss an error occured</p>;
   }
 
+  const getText = (html) => {
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    return doc.body.textContent;
+  };
+
   return (
     <div className="">
       <div className="mt-5 flex flex-col gap-28">
@@ -51,7 +56,7 @@ const Home = () => {
                 <Link to={`/post/${post.id}/`}>
                   <h1 className="text-5xl">{post.title}</h1>
                 </Link>
-                <p className="text-lg">{post.desc}</p>
+                <p className="text-lg">{getText(post.desc)}</p>
                 <button
                   className="bg-white px-5 py-2 cursor-pointer border border-solid border-teal-500 text-teal-500 hover:border hover:border-solid hover:bg-teal-500 hover:text-black"
                   style={{ width: "max-content" }}

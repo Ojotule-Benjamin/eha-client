@@ -14,13 +14,13 @@ const Single = () => {
   const navigate = useNavigation();
 
   const postId = location.pathname.split("/")[2];
-
   const { currentUser } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res = await axios.get(`/posts/${postId}`);
+        console.warn(res.data);
         setPost(res.data);
       } catch (err) {
         console.log(err);

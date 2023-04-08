@@ -41,7 +41,7 @@ const Write = () => {
     {}
   );
 
-  console.log({ mutate, isLoading, isError, data });
+  //console.log({ mutate, isLoading, isError, data });
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     noClick: true,
@@ -55,7 +55,6 @@ const Write = () => {
         reader.onload = (readerEvt) => {
           // Do whatever you want with the file contents
           const image = reader.result;
-
           setImgUrl(image);
           console.log(imgUrl);
         };
