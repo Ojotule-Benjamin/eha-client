@@ -2,9 +2,8 @@ import React, { useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { useDropzone } from "react-dropzone";
-import FileUpload from "../components/FileUpload";
 import axios from "axios";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import moment from "moment";
 import { useMutation } from "react-query";
 import { BASE_URL } from "./Home";
@@ -32,14 +31,20 @@ const Write = () => {
         },
       }
     );
+
     return res.data;
   };
 
   const { mutate, isLoading, isError, data } = useMutation(
     ["upload-post"],
     postBlog,
-    {}
+
+    {
+      onSuccess: () => navigate("/"),
+    }
   );
+
+  const navigate = useNavigate();
 
   //console.log({ mutate, isLoading, isError, data });
 
@@ -56,7 +61,7 @@ const Write = () => {
           // Do whatever you want with the file contents
           const image = reader.result;
           setImgUrl(image);
-          console.log(imgUrl);
+          // console.log(imgUrl);
         };
         reader.readAsDataURL(file);
       });
@@ -230,19 +235,3 @@ const Write = () => {
 };
 
 export default Write;
-
-// state
-// ? await axios.put(`./posts/${state.id}`, {
-//     title,
-//     desc: value,
-//     cat,
-//     img: imgUrl ? imgUrl : "",
-//   })
-// : await axios.post(`./posts/`, {
-//     title,
-//     desc: value,
-//     cat,
-//     img: imgUrl ? imgUrl : "",
-//     date: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
-//   });
-//await axios.post(`./posts`, { value, cat, title, imgUrl });
